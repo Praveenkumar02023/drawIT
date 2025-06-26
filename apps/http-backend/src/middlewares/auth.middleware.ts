@@ -1,11 +1,11 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Request, RequestHandler, Response } from "express";
 import jwt from "jsonwebtoken";
 
-interface AuthRequest extends Request{
+export interface AuthRequest extends Request{
     userId : string
 }
 
-export const authMiddlware = async(req : AuthRequest,res : Response,next : NextFunction) =>{
+export const authMiddlware : RequestHandler  =( async (req : AuthRequest,res : Response,next : NextFunction)  => {
 
 
     const authHeader = req.headers.authorization;
@@ -23,7 +23,7 @@ export const authMiddlware = async(req : AuthRequest,res : Response,next : NextF
         const isValid = jwt.verify(token!,process.env.JWT_SECRET!) as {userId : string};
 
         if(!isValid){
-            throw new Error();
+            throw new Error("token not valid");
         }
 
         req.userId = isValid.userId;
@@ -33,4 +33,4 @@ export const authMiddlware = async(req : AuthRequest,res : Response,next : NextF
     } catch (error) {
         return res.status(400).json({message : "internal server error"});
     }
-}
+}) as RequestHandler
