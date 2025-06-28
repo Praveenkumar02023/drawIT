@@ -1,0 +1,27 @@
+{
+  "name": "@repo/common",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev" : "tsc --watch",
+    "start" : "tsc"
+  },
+  "devDependencies": {
+    "@repo/typescript-config" : "workspace:*"
+  },
+  "exports" : {
+    "./signupValidator" : {
+      "types" : "./src/types.ts",
+      "default" : "./dist/types.js"
+    },
+    "./signinValidator" : {
+      "types" : "./src/types.ts",
+      "default" : "./dist/types.js"
+    }
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}

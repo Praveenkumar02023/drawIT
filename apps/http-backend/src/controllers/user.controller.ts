@@ -1,26 +1,11 @@
 import { Request, Response } from "express"
-import {z} from 'zod'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
-import dotenv from 'dotenv'
-import { AuthRequest } from "../middlewares/auth.middleware"
+import { JWT_SECRET } from "@repo/backend-common/JWT_SECRET"
+import { signupValidator , signinValidator } from "@repo/common/signupValidator"
 
 
 
-dotenv.config();
-
-const signupValidator = z.object({
-
-    firstName : z.string(),
-    lastName : z.string(),
-    email : z.string().email(),
-    password : z.string()
-});
-
-const signinValidator = z.object({
-    email : z.string().email(),
-    password : z.string()
-});
 
 
 export const signup = async(req : Request , res : Response) :Promise<any> =>{
@@ -41,7 +26,7 @@ export const signup = async(req : Request , res : Response) :Promise<any> =>{
     try {
         //save in db 
         
-        const token = jwt.sign({userId : "123"},process.env.JWT_SECRET!);
+        const token = jwt.sign({userId : "123"},JWT_SECRET);
         
         res.status(200).json({message : "Sign Up successfull",token});
 
@@ -75,7 +60,7 @@ export const signin = async(req : Request , res : Response) : Promise<any> =>{
         }
 
         //token
-        const token = jwt.sign({userId : 123},process.env.JWT_SECRET!);
+        const token = jwt.sign({userId : 123},JWT_SECRET);
 
         res.status(200).json({message : "Signin successfull.",token});
 
