@@ -5,14 +5,15 @@ import { JWT_SECRET } from "@repo/backend-common/config"
 import { signupValidator , signinValidator , createRoomValidator} from "@repo/common"
 
 import { prisma } from "@repo/db/prisma"
-import { number } from "zod/v4"
+
 
 export const signup = async(req : Request , res : Response) :Promise<any> =>{
 
     const parsed = signupValidator.safeParse(req.body);
 
     if(!parsed.success){
-
+        console.log(req.body);
+        
         return res.status(400).json({message : "Invalid inputs :("});
 
     }
@@ -24,14 +25,14 @@ export const signup = async(req : Request , res : Response) :Promise<any> =>{
 
     try {
         
-        const newUser = await prisma.user.findUnique({where : {email}});
+        const user = await prisma.user.findUnique({where : {email}});
         
-        if(newUser){
+        if(user){
             res.status(400).json({message : "User already Exists!"});
         }
         
         //save in db 
-        await prisma.user.create({
+        const newUser = await prisma.user.create({
             data : {
                 name,
                 email,
