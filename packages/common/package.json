@@ -18,6 +18,10 @@
     "./signinValidator" : {
       "types" : "./src/types.ts",
       "default" : "./dist/types.js"
+    },
+    "./createRoomValidator" : {
+      "types" : "./src/types.ts",
+      "default" : "./dist/types.js"
     }
   },
   "keywords": [],
