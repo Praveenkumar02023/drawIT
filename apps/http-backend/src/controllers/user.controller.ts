@@ -6,8 +6,6 @@ import { signupValidator , signinValidator } from "@repo/common/signupValidator"
 
 
 
-
-
 export const signup = async(req : Request , res : Response) :Promise<any> =>{
 
     const parsed = signupValidator.safeParse(req.body);
