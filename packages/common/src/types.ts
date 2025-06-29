@@ -14,6 +14,5 @@ export const signinValidator = z.object({
 });
 
 export const createRoomValidator = z.object({
-    adminId : z.string(),
     slug : z.string()
 })
