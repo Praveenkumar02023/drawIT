@@ -1,26 +1,24 @@
 {
   "name": "@repo/backend-common",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "dev": "tsc --watch",
-    "start": "tsc"
-  },
-  "devDependencies": {
-    "@repo/typescript-config": "workspace:*"
-  },
+  "type": "commonjs",
+  "main": "dist/index.js",
   "exports": {
-    "./JWT_SECRET": {
+    ".": "./dist/index.js",
+    "./config": {
       "types": "./src/config.ts",
       "default": "./dist/config.js"
     }
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
+  "files": ["dist"],
+  "scripts": {
+    "dev": "tsc --watch",
+    "build": "tsc -b"
+  },
   "dependencies": {
     "zod": "^3.25.67"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*"
   }
 }

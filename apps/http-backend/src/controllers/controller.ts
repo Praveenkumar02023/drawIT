@@ -1,10 +1,11 @@
 import  { Request, Response } from "express"
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
-import { JWT_SECRET } from "@repo/backend-common/JWT_SECRET"
-import { signupValidator , signinValidator , createRoomValidator} from "@repo/common/signupValidator"
+import { JWT_SECRET } from "@repo/backend-common/config"
+import { signupValidator , signinValidator , createRoomValidator} from "@repo/common"
 
 import { prisma } from "@repo/db/prisma"
+import { number } from "zod/v4"
 
 export const signup = async(req : Request , res : Response) :Promise<any> =>{
 
@@ -69,7 +70,7 @@ export const signin = async(req : Request , res : Response) : Promise<any> =>{
             res.status(400).json({message : "user not found"});
         }
 
-        const isVerified = await bcrypt.compare(password,user.password);
+        const isVerified = await bcrypt.compare(password,user!.password);
 
         if(!isVerified){
             return res.status(400).json({message : "Incorrect Password"});
@@ -114,11 +115,13 @@ export const createRoom = async(req: Request ,res : Response) : Promise<any>  =>
         }
 
         const newRoom = await prisma.room.create({
-            slug,
-            adminId
+            data : {
+                slug ,
+                adminId
+            }
         });
 
-        const roomId = (newRoom.id as string);
+        const roomId = (newRoom.id);
 
         res.status(200).json({message : "Room created!",roomId});
 
@@ -134,7 +137,7 @@ export const createRoom = async(req: Request ,res : Response) : Promise<any>  =>
 
 export const getMessages = async(req : Request , res : Response) : Promise<any> => {
 
-    const roomId = req.params.id;
+    const roomId = Number(req.params.id);
 
     try {
 
