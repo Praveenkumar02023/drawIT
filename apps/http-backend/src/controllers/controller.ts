@@ -11,8 +11,8 @@ export const signup = async(req : Request , res : Response) :Promise<any> =>{
 
     const parsed = signupValidator.safeParse(req.body);
 
+    console.log(req.body);
     if(!parsed.success){
-        console.log(req.body);
         
         return res.status(400).json({message : "Invalid inputs :("});
 
@@ -28,7 +28,7 @@ export const signup = async(req : Request , res : Response) :Promise<any> =>{
         const user = await prisma.user.findUnique({where : {email}});
         
         if(user){
-            res.status(400).json({message : "User already Exists!"});
+            return res.status(400).json({message : "User already Exists!"});
         }
         
         //save in db 
@@ -40,7 +40,7 @@ export const signup = async(req : Request , res : Response) :Promise<any> =>{
             }
         });
 
-        const token = jwt.sign({userId : "123"},JWT_SECRET);
+        const token = jwt.sign({userId : newUser.id},JWT_SECRET);
         
         res.status(200).json({message : "Sign Up successfull",token , newUser});
 
@@ -78,7 +78,7 @@ export const signin = async(req : Request , res : Response) : Promise<any> =>{
         }
 
         //token
-        const token = jwt.sign({userId : 123},JWT_SECRET);
+        const token = jwt.sign({userId : user?.id},JWT_SECRET);
 
         res.status(200).json({message : "Signin successfull.",token});
 
@@ -96,14 +96,18 @@ export const createRoom = async(req: Request ,res : Response) : Promise<any>  =>
 
     const parsed = createRoomValidator.safeParse(req.body);
 
+    console.log(req.body);
     if(!parsed.success){
-
+        
         return res.status(400).json({message : "invalid Room details"})
 
     }
 
-    const adminId = (req as any).userId as string;
+    // return res.status(200).json({message : "done"});
 
+    const adminId = (req as any).userId as string;
+    console.log(adminId);
+    
     const slug = parsed.data.slug;
 
     try {
@@ -111,8 +115,17 @@ export const createRoom = async(req: Request ,res : Response) : Promise<any>  =>
 
         const room = await prisma.room.findUnique({where : {slug : slug}});
 
+
+
         if(room){
-            return res.status(400).json({message : "Room with this slug already exist"});
+
+            return res.status(200).json({
+                message: "Room already exists",
+                roomId: room.id,
+                alreadyExists: true
+            });
+
+            
         }
 
         const newRoom = await prisma.room.create({
@@ -126,14 +139,17 @@ export const createRoom = async(req: Request ,res : Response) : Promise<any>  =>
 
         res.status(200).json({message : "Room created!",roomId});
 
-    } catch (error) {
-        
-        console.log(error);
-        return res.status(500).json({message : (error as Error).message || "something went wrong"});
+   } catch (error: any) {
+  console.error("🔥 Error creating room:", error);
 
-    }
+  return res.status(500).json({
+    message:  "something went wrong",
+    stack: error.stack,
+  });
+}
 
-    res.status(200).json({message : "code generated successfully!",});
+
+   
 }
 
 export const getMessages = async(req : Request , res : Response) : Promise<any> => {
@@ -143,8 +159,10 @@ export const getMessages = async(req : Request , res : Response) : Promise<any> 
     try {
 
         const messages = await prisma.chat.findMany({
-            where : { roomId }
-        });
+            where : { roomId },
+            take : 50
+        },
+    );
         
         res.status(200).json({message : "messages fetched" , messages});
         

@@ -75,6 +75,7 @@ ws.on("connection", (ws, req) => {
       users.map((u) => {
         u.userId == userId ? u.roomId.push(String(parsedData.roomId)) : null;
       });
+      
     }
 
     if (parsedData.type === "leave_room") {
@@ -89,7 +90,7 @@ ws.on("connection", (ws, req) => {
       users
         .filter((u) => u.roomId.includes(String(parsedData.roomId)))
         .forEach((u) => {
-          u.ws.send(parsedData.message);
+          u.ws.send(JSON.stringify(parsedData));
         });
     }
   });
