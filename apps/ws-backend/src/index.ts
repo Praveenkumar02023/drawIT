@@ -3,7 +3,7 @@ import { parse } from "url";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "@repo/backend-common/config";
 import { log } from "console";
-
+import { prisma } from "@repo/db/prisma";
 
 interface User {
   ws: WebSocket;
@@ -65,7 +65,7 @@ ws.on("connection", (ws, req) => {
 
   ws.on("error", console.error);
 
-  ws.on("message", (data) => {
+  ws.on("message", async(data) => {
     const parsedData = JSON.parse(data.toString());
 
     if (parsedData.type == "join_room") {
@@ -87,6 +87,19 @@ ws.on("connection", (ws, req) => {
     }
 
     if (parsedData.type === "chat") {
+
+      const roomId = parsedData.roomId;
+
+      await prisma.chat.create({
+        data : {
+
+          message : parsedData.message,
+          userId,
+          roomId : Number(roomId)
+
+        }
+      })
+
       users
         .filter((u) => u.roomId.includes(String(parsedData.roomId)))
         .forEach((u) => {
