@@ -1,8 +1,8 @@
 "use client";
 
-import { getMousePos, handleEvents } from "../../canvasUtils/page";
+import {  handleEvents } from "../../canvasUtils/page";
 import { drawAllShapes } from "../../canvasUtils/page";
-import { useState,useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 
 interface rect{
@@ -31,10 +31,11 @@ export interface shapeType{
 const ChatRoom = () => {
   
   const canvasRef = useRef<HTMLCanvasElement>(null);
-   const shapesRef = useRef<shapeType[]>([]);
+  const shapesRef = useRef<shapeType[]>([]);
   const startX = useRef(0);
   const startY = useRef(0);
   const mouseDown = useRef(false);
+  const shapeType = useRef<"rect" | "circle">("rect");
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -60,7 +61,7 @@ const ChatRoom = () => {
       startY,
       shapesRef,
       ctx,
-
+      shapeType
     );
 
    return cleanup
@@ -68,8 +69,12 @@ const ChatRoom = () => {
   }, []);
 
   return (
-    <div className="h-screen w-screen flex justify-center items-center overflow-hidden">
-      <canvas ref={canvasRef} className="h-full w-full"></canvas>
+    <div className="h-screen w-screen flex flex-col justify-center items-center overflow-hidden gap-4 p-4 bg-gray-100">
+      <div className="flex gap-4" >
+        <button className="h-10 w-24 rounded-lg bg-gray-700 text-white" onClick={() => {shapeType.current = "rect"}} >Rectangle</button>
+        <button className="h-10 w-24 rounded-lg bg-gray-700 text-white" onClick={() => {shapeType.current = "circle"}} >Circle</button>
+      </div>
+      <canvas ref={canvasRef} className="h-full w-full border-block"></canvas>
     </div>
   );
 };

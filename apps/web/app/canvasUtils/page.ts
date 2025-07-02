@@ -1,34 +1,54 @@
 import { shapeType } from "../room/[slug]/page";
-import React, { useState,useEffect, useRef } from "react";
+import React from "react";
 
-export const getMousePos = (event: MouseEvent , canvas : HTMLCanvasElement) => {
-      
-    const rect = canvas.getBoundingClientRect();
+export const getMousePos = (event: MouseEvent, canvas: HTMLCanvasElement) => {
+  const rect = canvas.getBoundingClientRect();
 
-      const x = event.clientX - rect.left;
-      const y = event.clientY - rect.top;
+  const x = event.clientX - rect.left;
+  const y = event.clientY - rect.top;
 
-      return {
-       x,y
-      };
-    };
+  return {
+    x,
+    y,
+  };
+};
 
-export const drawAllShapes = (canvas: HTMLCanvasElement, shapes : shapeType[] , ctx : CanvasRenderingContext2D) => 
-    {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = "lightslategray";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+export const drawAllShapes = (
+  canvas: HTMLCanvasElement,
+  shapes: shapeType[],
+  ctx: CanvasRenderingContext2D
+) => {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "lightslategray";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      for (const shape of shapes) {
-        if (shape.type === "rect" && shape.rect) {
-          ctx.strokeStyle = "black";
-          ctx.fillStyle = "white";
-          ctx.fillRect(shape.rect.x, shape.rect.y, shape.rect.width, shape.rect.height);
-          ctx.strokeRect(shape.rect.x, shape.rect.y, shape.rect.width, shape.rect.height);
-        }
-      }
-    };
-
+  for (const shape of shapes) {
+    if (shape.type === "rect" && shape.rect) {
+      ctx.strokeStyle = "black";
+      ctx.fillStyle = "white";
+      ctx.fillRect(
+        shape.rect.x,
+        shape.rect.y,
+        shape.rect.width,
+        shape.rect.height
+      );
+      ctx.strokeRect(
+        shape.rect.x,
+        shape.rect.y,
+        shape.rect.width,
+        shape.rect.height
+      );
+    } else if (shape.type === "circle" && shape.circle) {
+      const { x, y, radius } = shape.circle;
+      ctx.beginPath();
+      ctx.strokeStyle = "black";
+      ctx.fillStyle = "white";
+      ctx.arc(x, y, radius, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.fill();
+    }
+  }
+};
 
 export const handleEvents = (
   canvas: HTMLCanvasElement,
@@ -37,6 +57,7 @@ export const handleEvents = (
   startY: React.RefObject<number>,
   shapesRef: React.RefObject<shapeType[]>,
   ctx: CanvasRenderingContext2D,
+  shapeType: React.RefObject<"rect" | "circle">
 ) => {
   const onMouseDown = (event: MouseEvent) => {
     mouseDown.current = true;
@@ -53,8 +74,20 @@ export const handleEvents = (
 
     drawAllShapes(canvas, shapesRef.current, ctx);
 
-    ctx.strokeStyle = "black";
-    ctx.strokeRect(startX.current, startY.current, width, height);
+    if (shapeType.current === "rect") {
+      
+        ctx.strokeStyle = "black";
+      ctx.strokeRect(startX.current,startY.current, width, height);
+
+    } else if (shapeType.current === "circle") {
+      
+      const radius = Math.sqrt(width * width + height * height);
+      
+      ctx.beginPath();
+      ctx.strokeStyle = "black";
+      ctx.arc(startX.current,startY.current, radius, 0, Math.PI * 2);
+      ctx.stroke();
+    }
   };
 
   const onMouseUp = (event: MouseEvent) => {
@@ -65,17 +98,35 @@ export const handleEvents = (
     const width = x - startX.current;
     const height = y - startY.current;
 
-    const newShape: shapeType = {
-      type: "rect",
-      rect: {
-        x: startX.current,
-        y: startY.current,
-        width,
-        height,
-      },
-    };
+    if(shapeType.current === "rect"){
 
-    shapesRef.current.push(newShape);
+        const newShape: shapeType = {
+        type: "rect",
+        rect: {
+            x: startX.current,
+            y: startY.current,
+            width,
+            height,
+        },
+        };
+
+        shapesRef.current.push(newShape);
+
+    }
+    else if(shapeType.current === 'circle'){
+
+        const newShape: shapeType = {
+        type: "circle",
+        circle: {
+            x: startX.current,
+            y: startY.current,
+            radius : Math.sqrt(width*width + height*height)
+        }
+        };
+
+        shapesRef.current.push(newShape);
+
+    }
     drawAllShapes(canvas, shapesRef.current, ctx);
   };
 
