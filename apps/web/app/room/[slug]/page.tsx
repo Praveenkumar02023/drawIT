@@ -2,7 +2,8 @@
 
 import {  handleEvents } from "../../canvasUtils/page";
 import { drawAllShapes } from "../../canvasUtils/page";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import Toolbar, { toolType } from "../../components/page";
 
 
 interface rect{
@@ -20,12 +21,13 @@ interface circle{
 
 
 
- export interface toolType{
+ export interface displayShapeType{
 
   type : "rect" | "circle" | "pencil"
 
   rect? : rect
   circle? : circle
+
 }
 
 
@@ -33,11 +35,19 @@ interface circle{
 const ChatRoom = () => {
   
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const shapesRef = useRef<toolType[]>([]);
+  const shapesRef = useRef<displayShapeType[]>([]);
   const startX = useRef(0);
   const startY = useRef(0);
+  const lastX = useRef(0);
+  const lastY = useRef(0);
+
   const mouseDown = useRef(false);
-  const shapeType = useRef<"rect" | "circle">("rect");
+  const [selectedTool,setSelectedTool] = useState<toolType>('rect')
+  const currentToolRef = useRef<toolType>('rect');
+
+  useEffect(()=>{
+    currentToolRef.current = selectedTool
+  },[selectedTool])
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -63,7 +73,9 @@ const ChatRoom = () => {
       startY,
       shapesRef,
       ctx,
-      shapeType
+      currentToolRef,
+      lastX,
+      lastY
     );
 
    return cleanup
@@ -71,12 +83,9 @@ const ChatRoom = () => {
   }, []);
 
   return (
-    <div className="h-screen w-screen flex flex-col justify-center items-center overflow-hidden gap-4 p-4 bg-gray-100">
-      <div className="flex gap-4" >
-        <button className="h-10 w-24 rounded-lg bg-gray-700 text-white" onClick={() => {shapeType.current = "rect"}} >Rectangle</button>
-        <button className="h-10 w-24 rounded-lg bg-gray-700 text-white" onClick={() => {shapeType.current = "circle"}} >Circle</button>
-      </div>
-      <canvas ref={canvasRef} className="h-full w-full border-block"></canvas>
+    <div className="h-screen w-screen flex  justify-center items-center overflow-hidden bg-gray-100 ">
+      <Toolbar setSelectedTool={setSelectedTool} selectedTool={selectedTool} />
+      <canvas ref={canvasRef}  className="h-full w-full border-block"></canvas>
     </div>
   );
 };

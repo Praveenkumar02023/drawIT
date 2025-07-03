@@ -2,19 +2,21 @@
 
 
 import {Circle, LucideProps, Pen, Pencil, Square} from 'lucide-react'
-import React, { useRef, useState } from 'react'
+import React, { Dispatch, SetStateAction, useRef, useState } from 'react'
 import { DisplayTool } from './DisplayTool';
 
-type toolType = "rect" | "circle" | "pencil" ;
+export type toolType = "rect" | "circle" | "pencil" ;
 
-export const Toolbar = () => {
+interface toolbarProps {
+  setSelectedTool : Dispatch<SetStateAction<toolType>>,
+  selectedTool : toolType
+}
 
-  const [selectedTool,setSelectedTool] = useState<toolType>('rect');
-    
+export const Toolbar = ({setSelectedTool , selectedTool } : toolbarProps) => {
   
   return (
-    <div className='h-screen'>
-        <div className='py-8 flex flex-col  h-full w-fit border-r justify-start gap-y-4 px-6'>
+    
+        <div className='py-8 flex flex-col  h-full w-fit border-r justify-start gap-y-4 px-4'>
 
          <DisplayTool 
           onClick={()=>setSelectedTool("rect")} 
@@ -39,7 +41,6 @@ export const Toolbar = () => {
          
 
         </div>
-    </div >
   )
 }
 

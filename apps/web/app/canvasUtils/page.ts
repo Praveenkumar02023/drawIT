@@ -1,5 +1,6 @@
-import { shapeType } from "../room/[slug]/page";
-import React from "react";
+import { toolType } from "../components/page";
+import { displayShapeType } from "../room/[slug]/page";
+import React, { useRef } from "react";
 
 export const getMousePos = (event: MouseEvent, canvas: HTMLCanvasElement) => {
   const rect = canvas.getBoundingClientRect();
@@ -15,7 +16,7 @@ export const getMousePos = (event: MouseEvent, canvas: HTMLCanvasElement) => {
 
 export const drawAllShapes = (
   canvas: HTMLCanvasElement,
-  shapes: shapeType[],
+  shapes: displayShapeType[],
   ctx: CanvasRenderingContext2D
 ) => {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -55,15 +56,24 @@ export const handleEvents = (
   mouseDown: React.RefObject<boolean>,
   startX: React.RefObject<number>,
   startY: React.RefObject<number>,
-  shapesRef: React.RefObject<shapeType[]>,
+  shapesRef: React.RefObject<displayShapeType[]>,
   ctx: CanvasRenderingContext2D,
-  shapeType: React.RefObject<"rect" | "circle">
+  currentTool: React.RefObject<toolType>,
+  lastX: React.RefObject<number>,
+  lastY: React.RefObject<number>,
+
 ) => {
+
   const onMouseDown = (event: MouseEvent) => {
     mouseDown.current = true;
     const { x, y } = getMousePos(event, canvas);
     startX.current = x;
     startY.current = y;
+   
+    if(currentTool.current === "pencil"){
+      lastX.current = x;
+      lastY.current = y;
+    }
   };
 
   const onMouseMove = (event: MouseEvent) => {
@@ -72,14 +82,22 @@ export const handleEvents = (
     const width = x - startX.current;
     const height = y - startY.current;
 
-    drawAllShapes(canvas, shapesRef.current, ctx);
+    if(currentTool.current !== 'pencil'){
+      drawAllShapes(canvas, shapesRef.current, ctx);
+    }
+    
+    //for drawing rectangle
 
-    if (shapeType.current === "rect") {
+    if (currentTool.current  === "rect") {
       
         ctx.strokeStyle = "black";
       ctx.strokeRect(startX.current,startY.current, width, height);
 
-    } else if (shapeType.current === "circle") {
+    } 
+    
+    //for drawing circle
+
+    else if (currentTool.current === "circle") {
       
       const radius = Math.sqrt(width * width + height * height);
       
@@ -87,6 +105,20 @@ export const handleEvents = (
       ctx.strokeStyle = "black";
       ctx.arc(startX.current,startY.current, radius, 0, Math.PI * 2);
       ctx.stroke();
+    }
+
+    // for drawing with pencil
+
+    else if(currentTool.current === "pencil"){
+
+      ctx.beginPath();
+      ctx.moveTo(lastX.current,lastY.current);
+      ctx.lineTo(x,y);
+      ctx.stroke()
+      ctx.closePath()
+
+      lastX.current = x;
+      lastY.current = y;
     }
   };
 
@@ -98,9 +130,9 @@ export const handleEvents = (
     const width = x - startX.current;
     const height = y - startY.current;
 
-    if(shapeType.current === "rect"){
+    if(currentTool.current === "rect"){
 
-        const newShape: shapeType = {
+        const newShape: displayShapeType = {
         type: "rect",
         rect: {
             x: startX.current,
@@ -113,9 +145,9 @@ export const handleEvents = (
         shapesRef.current.push(newShape);
 
     }
-    else if(shapeType.current === 'circle'){
+    else if(currentTool.current === 'circle'){
 
-        const newShape: shapeType = {
+        const newShape: displayShapeType = {
         type: "circle",
         circle: {
             x: startX.current,
@@ -127,6 +159,22 @@ export const handleEvents = (
         shapesRef.current.push(newShape);
 
     }
+
+    else if(currentTool.current === "pencil"){
+
+      const newShape: displayShapeType = {
+        type: "circle",
+        circle: {
+            x: startX.current,
+            y: startY.current,
+            radius : Math.sqrt(width*width + height*height)
+        }
+        };
+
+        shapesRef.current.push(newShape);      
+
+    }
+
     drawAllShapes(canvas, shapesRef.current, ctx);
   };
 
