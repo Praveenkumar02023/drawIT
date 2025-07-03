@@ -18,9 +18,11 @@ interface circle{
   radius:number,
 }
 
-export interface shapeType{
 
-  type : "rect" | "circle"
+
+ export interface toolType{
+
+  type : "rect" | "circle" | "pencil"
 
   rect? : rect
   circle? : circle
@@ -31,7 +33,7 @@ export interface shapeType{
 const ChatRoom = () => {
   
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const shapesRef = useRef<shapeType[]>([]);
+  const shapesRef = useRef<toolType[]>([]);
   const startX = useRef(0);
   const startY = useRef(0);
   const mouseDown = useRef(false);
