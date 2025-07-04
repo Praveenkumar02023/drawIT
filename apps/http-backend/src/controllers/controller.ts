@@ -84,7 +84,7 @@ export const signin = async(req : Request , res : Response) : Promise<any> =>{
 
     } catch (error) {
 
-        res.status(500).json({message : "Internal server error"});
+        res.status(500).json({message : (error as Error).message  || "Internal server error"});
 
     }
 

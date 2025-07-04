@@ -13,7 +13,9 @@ export const handleEvents = (
   currentTool: React.RefObject<toolType>,
   lastX: React.RefObject<number>,
   lastY: React.RefObject<number>,
-  pencilPathRef: React.RefObject<{ x: number; y: number }[]>
+  pencilPathRef: React.RefObject<{ x: number; y: number }[]>,
+  ws : React.RefObject<WebSocket | null>,
+  roomIdRef : React.RefObject<string | null>
 ) => {
   const onMouseDown = (event: MouseEvent) => {
     mouseDown.current = true;
@@ -131,6 +133,12 @@ export const handleEvents = (
       };
 
       shapesRef.current.push(newShape);
+      ws.current!.send(JSON.stringify({
+          "type" : "chat",
+          "message" : JSON.stringify(newShape),
+          "roomId" : roomIdRef.current
+        }));
+
     } else if (currentTool.current === "circle") {
       const newShape: displayShapeType = {
         type: "circle",
@@ -142,6 +150,12 @@ export const handleEvents = (
       };
 
       shapesRef.current.push(newShape);
+       ws.current!.send(JSON.stringify({
+          "type" : "chat",
+          "message" : JSON.stringify(newShape),
+          "roomId" : roomIdRef.current
+        }));
+
     } else if (currentTool.current === "pencil") {
       const newShape: displayShapeType = {
         type: "pencil",
@@ -149,7 +163,14 @@ export const handleEvents = (
       };
 
       shapesRef.current.push(newShape);
+        ws.current!.send(JSON.stringify({
+          "type" : "chat",
+          "message" : JSON.stringify(newShape),
+          "roomId" : roomIdRef.current
+        }));
       pencilPathRef.current = [];
+
+
     } else if (currentTool.current === "line") {
       const newShape: displayShapeType = {
         type: "line",
@@ -162,6 +183,11 @@ export const handleEvents = (
       };
 
       shapesRef.current.push(newShape);
+       ws.current!.send(JSON.stringify({
+          "type" : "chat",
+          "message" : JSON.stringify(newShape),
+          "roomId" : roomIdRef.current
+        }));
     }
     
     else if(currentTool.current === "arrow"){
@@ -178,7 +204,11 @@ export const handleEvents = (
       };
 
       shapesRef.current.push(newShape);
-
+        ws.current!.send(JSON.stringify({
+          "type" : "chat",
+          "message" : JSON.stringify(newShape),
+          "roomId" : roomIdRef.current
+        }));
     }
 
     drawAllShapes(canvas, shapesRef.current, ctx);
