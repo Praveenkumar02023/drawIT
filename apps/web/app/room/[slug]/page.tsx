@@ -1,49 +1,36 @@
 "use client";
 
-import {  handleEvents } from "../../canvasUtils/page";
-import { drawAllShapes } from "../../canvasUtils/page";
+import {  handleEvents } from "../../canvasUtils/HandleEvents";
+import { drawAllShapes } from "../../canvasUtils/DrawShape";
 import { useEffect, useRef, useState } from "react";
-import Toolbar, { toolType } from "../../components/page";
-
-
-interface rect{
-  x:number,
-  y:number,
-  height:number,
-  width:number
-}
-
-interface circle{
-  x:number,
-  y:number,
-  radius:number,
-}
-
-
-
- export interface displayShapeType{
-
-  type : "rect" | "circle" | "pencil"
-
-  rect? : rect
-  circle? : circle
-
-}
+import { toolType } from "../../canvasUtils/ToolTypes";
+import { displayShapeType } from "../../canvasUtils/ToolTypes";
+import Toolbar from "../../components/page";
 
 
 
 const ChatRoom = () => {
   
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  
+  //array to hold the current canvas shapes.
   const shapesRef = useRef<displayShapeType[]>([]);
+  
+  //start point of the drawing.
   const startX = useRef(0);
   const startY = useRef(0);
+
+  //last point of the drawing
   const lastX = useRef(0);
   const lastY = useRef(0);
 
+  //drawing or not.
   const mouseDown = useRef(false);
+  
   const [selectedTool,setSelectedTool] = useState<toolType>('rect')
   const currentToolRef = useRef<toolType>('rect');
+  const pencilPathRef = useRef<{x:number,y:number}[]>([]);
+
 
   useEffect(()=>{
     currentToolRef.current = selectedTool
@@ -75,7 +62,8 @@ const ChatRoom = () => {
       ctx,
       currentToolRef,
       lastX,
-      lastY
+      lastY,
+      pencilPathRef
     );
 
    return cleanup

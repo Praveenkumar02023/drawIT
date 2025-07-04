@@ -1,11 +1,11 @@
 "use client"
 
 
-import {Circle, LucideProps, Pen, Pencil, Square} from 'lucide-react'
+import {Circle, LucideProps, Minus, Pen, Pencil, Square} from 'lucide-react'
 import React, { Dispatch, SetStateAction, useRef, useState } from 'react'
 import { DisplayTool } from './DisplayTool';
+import { toolType } from "../canvasUtils/ToolTypes";
 
-export type toolType = "rect" | "circle" | "pencil" ;
 
 interface toolbarProps {
   setSelectedTool : Dispatch<SetStateAction<toolType>>,
@@ -38,7 +38,13 @@ export const Toolbar = ({setSelectedTool , selectedTool } : toolbarProps) => {
           selectedTool={selectedTool}
           Icon={Pencil}
          />
-         
+
+          <DisplayTool 
+          onClick={()=>setSelectedTool("line")} 
+          toolName={"line"} 
+          selectedTool={selectedTool}
+          Icon={Minus}
+         />
 
         </div>
   )
