@@ -2,14 +2,16 @@ import { displayShapeType } from "./ToolTypes"
 
 export const drawAllShapes = (
   canvas: HTMLCanvasElement,
-  shapes: displayShapeType[],
+  shapes: displayShapeType [],
   ctx: CanvasRenderingContext2D
 ) => {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.fillStyle = "lightslategray";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  for (const shape of shapes) {
+  for (let shape of shapes) {
+
+
     if (shape.type === "rect" && shape.rect) {
       ctx.strokeStyle = "black";
       ctx.fillStyle = "white";

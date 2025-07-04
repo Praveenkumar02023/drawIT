@@ -2,7 +2,7 @@
 
 import { handleEvents } from "../../canvasUtils/HandleEvents";
 import { drawAllShapes } from "../../canvasUtils/DrawShape";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { toolType } from "../../canvasUtils/ToolTypes";
 import { displayShapeType } from "../../canvasUtils/ToolTypes";
 import Toolbar from "../../components/Toolbar";
@@ -39,6 +39,7 @@ const ChatRoom = () => {
   }, [selectedTool]);
 
   useEffect(() => {
+    
     const canvas = canvasRef.current;
     if (!canvas) return;
     canvas.height = canvas.offsetHeight;
@@ -54,11 +55,11 @@ const ChatRoom = () => {
     const init = async () => {
       await getRoomId(slug, token, roomIdRef);
       if (!roomIdRef.current) return;
-      
+      await getLastMessages(token,roomIdRef,shapesRef);
       const ws = useSocket(token, roomIdRef.current);
-
+      
       if(ws){
-
+        
         wsRef.current = ws
 
       }
@@ -129,3 +130,57 @@ async function getRoomId(
     console.log(error);
   }
 }
+
+const getLastMessages = async (
+  token: string,
+  roomIdRef: React.RefObject<string | null>,
+  shapesRef: React.RefObject<displayShapeType[]>
+) => {
+  try {
+    const response = await axios.get(
+      `http://localhost:8000/api/v1/user/chats/${roomIdRef.current}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (!response) return;
+
+    const rawShapes = response.data.messages;
+
+    const parsedShapes: displayShapeType[] = rawShapes.map((msg: any) => {
+      try {
+        const shape = JSON.parse(msg.message);
+
+        if (!shape || typeof shape !== "object") return null;
+
+        switch (shape.type) {
+          case "rect":
+            return { type: "rect", rect: shape.rect };
+          case "circle":
+            return { type: "circle", circle: shape.circle };
+          case "pencil":
+            return { type: "pencil", pencilPath: shape.pencilPath };
+          case "line":
+            return { type: "line", linePoints: shape.linePoints };
+          case "arrow":
+            return { type: "arrow", arrowPoints: shape.arrowPoints };
+          default:
+            return null;
+        }
+      } catch (err) {
+        console.warn("Failed to parse message:", msg.message);
+        return null;
+      }
+    }).filter(Boolean);
+
+    console.log("Parsed shapes from backend:", parsedShapes);
+
+    shapesRef.current = [...shapesRef.current, ...parsedShapes];
+  } catch (error) {
+    console.log("Error fetching previous shapes:", error);
+  }
+};
+
