@@ -77,6 +77,38 @@ export const handleEvents = (
       ctx.stroke();
       ctx.closePath();
     }
+
+    //for drawing arrow
+    else if(currentTool.current === "arrow"){
+
+      ctx.beginPath();
+      ctx.moveTo(startX.current, startY.current);
+      ctx.lineTo(x, y);
+      
+      const dx = x-startX.current;
+      const dy = y-startY.current;
+
+      const angle = Math.atan2(dy,dx);
+      
+      const headLen = 10
+      const arrowAngle = Math.PI/6;
+      
+      const leftX = x - headLen * Math.cos(angle-arrowAngle);
+      const leftY = y - headLen * Math.sin(angle-arrowAngle);
+      const rightX = x - headLen * Math.cos(angle+arrowAngle);
+      const rightY = y - headLen * Math.sin(angle+arrowAngle);
+
+      ctx.moveTo(x,y);
+      ctx.lineTo(leftX,leftY);
+      
+      
+      ctx.moveTo(x,y);
+      ctx.lineTo(rightX,rightY);
+      
+      ctx.stroke();
+      ctx.closePath()
+    }
+
   };
 
   const onMouseUp = (event: MouseEvent) => {
@@ -130,6 +162,23 @@ export const handleEvents = (
       };
 
       shapesRef.current.push(newShape);
+    }
+    
+    else if(currentTool.current === "arrow"){
+
+
+      const newShape: displayShapeType = {
+        type: "arrow",
+        arrowPoints: {
+          x1: startX.current,
+          y1: startY.current,
+          x2: x,
+          y2: y,
+        },
+      };
+
+      shapesRef.current.push(newShape);
+
     }
 
     drawAllShapes(canvas, shapesRef.current, ctx);

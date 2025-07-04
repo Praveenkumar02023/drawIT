@@ -23,7 +23,8 @@ export interface line{
   y2 : number
 }
 
-export type toolType = "rect" | "circle" | "pencil" | "line";
+
+export type toolType = "rect" | "circle" | "pencil" | "line" | "arrow";
 
 export interface displayShapeType{
 
@@ -33,4 +34,6 @@ export interface displayShapeType{
   circle? : circle
   pencilPath? : pencilPath[]
   linePoints? : line
+  arrowPoints? :line
+  
 }
